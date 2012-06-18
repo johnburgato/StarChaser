@@ -76,8 +76,6 @@ var Graphics = new function(){
 
 	}
 
-	var highlightedStar = null; // Currently highlighted star
-
 	this.init = function(volumes) {
 
 		container = document.getElementById('container');
@@ -187,6 +185,28 @@ var Graphics = new function(){
 		document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 	};
 
+	var highlightedStar = null; // Currently highlighted star
+	var highlightedStarObj = null; // The 3d objecr representing the highlight
+	var starMaterials = [
+		new THREE.MeshBasicMaterial( { color: 0xff0000, wireframe: true } )
+	];
+
+	var highlightStar = function(star){
+		if(star == highlightedStar) return;
+		
+		if(highlightedStarObj != null){
+			scene.remove(highlightedStarObj);
+		}
+		
+		// stars as spheres
+		// siz, latitudes, longitudes
+		var starObj = THREE.SceneUtils.createMultiMaterialObject( new THREE.SphereGeometry( 10, 10, 10 ), starMaterials );
+		starObj.position.set( star.x, star.y, star.z );
+		scene.add( starObj );
+		
+		highlightedStar = star;
+		highlightedStarObj = starObj;
+	};
 
 	var lastTime = 0;
 
@@ -224,6 +244,10 @@ var Graphics = new function(){
 		if ( intersects.length > 0 ) {
 			
 			// new intersection
+			INTERSECTED = intersects[ 0 ].object;
+			highlightStar(INTERSECTED.starPtr);
+			/*
+			
 			if ( INTERSECTED != intersects[ 0 ].object ) { 
 				// if not the same object
 				if ( INTERSECTED ) INTERSECTED.material.program = programFill; // clear old intersection
@@ -233,13 +257,14 @@ var Graphics = new function(){
 				
 				highlightedStar = INTERSECTED.starPtr;
 				alert(highlightedStar);
-			}
+			}*/
 
 		} else {
 			// no new intersection
-			if ( INTERSECTED ) INTERSECTED.material.program = programFill;
+			highlightStar(INTERSECTED.starPtr);
+			/*if ( INTERSECTED ) INTERSECTED.material.program = programFill;
 
-			INTERSECTED = null;
+			INTERSECTED = null;*/
 		}
 		
 	};
