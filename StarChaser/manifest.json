@@ -1,0 +1,15 @@
+{
+  "name": "Star Chaser",
+  "description": "Ever expanding space strategy",
+  "version": "1",
+  "app": {
+    "launch": {
+      "local_path": "main.html",
+      "container": "tab"
+    }
+  },
+  "icons": {
+    "16": "StarChaser_16.png",
+    "128": "StarChaser_128.png"
+  }
+}

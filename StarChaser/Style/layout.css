@@ -1,0 +1,50 @@
+body {
+}
+
+.hidden{
+	display: none;
+	visibility: hidden
+}
+
+.horizon{
+	background-color: transparent;
+    text-align: center;
+    position: absolute;
+    top: 50%;
+    left: 0px;
+    width: 100%;
+    height: 1px;
+    overflow: visible;
+    visibility: visible;
+    display: block
+}
+
+.menu-screen{
+	background-color: #0000ff;
+	text-align: center;
+	
+}
+
+.menu-container{
+	background-color: #ff4000;
+	padding: 30px;
+	display: inline-block;
+	/*margin-top: 200px;
+	margin-bottom: 200px;*/
+	height: 300px; /* add 70 for a new button */
+	top: -140px; /* remove 35 for a new button */
+	position: relative;
+}
+
+.menu-selection{
+	background-color: #00ff00;
+	margin: 20px;
+	width: 100px;
+	height: 50px;
+	text-align: center;
+	/*vertical-align: middle;*/
+}
+
+.menu-text{
+	
+}
