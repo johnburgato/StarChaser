@@ -63,8 +63,7 @@ var Graphics = new function(){
 
 	var PI2 = Math.PI * 2;
 
-	var INTERSECTED;
-	var mouse = { x: 0, y: 0 }, INTERSECTED;
+	var mouse = { x: 0, y: 0 };
 	var starPs;
 
 	var onDocumentMouseMove = function( event ) {
@@ -73,8 +72,7 @@ var Graphics = new function(){
 
 		mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
 		mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
-
-	}
+	};
 
 	this.init = function(volumes) {
 
@@ -88,6 +86,8 @@ var Graphics = new function(){
 		controls.domElement = container;
 		controls.autoForward = false;
 		controls.dragToLook = false;
+		controls.rollSpeed = 0.0005;
+		controls.movementSpeed = 0.5;
 
 		scene = new THREE.Scene();
 
@@ -115,7 +115,6 @@ var Graphics = new function(){
 			scene.add( object );
 			
 			// Draw stars in volume
-			
 			var starsGeometry = new THREE.Geometry();
 			var starColours = [];
 			for(var sIndex in volume.stars){
@@ -131,41 +130,20 @@ var Graphics = new function(){
 				starsGeometry.vertices.push( vertex );
 				
 				starColours[ sIndex ] = new THREE.Color( star.colour );
-				
-				// stars as spheres
-				// siz, latitudes, longitudes
-				/*var starObj = THREE.SceneUtils.createMultiMaterialObject( new THREE.SphereGeometry( 10, 10, 10 ), starMaterials );
-				starObj.position.set( star.x, star.y, star.z );
-				scene.add( starObj );*/
 			}
 			
+			// Set the colours on the geometry so that the particle system can pick them up
 			starsGeometry.colors = starColours;
 			
 			// Start PARTICLES
-			//var parameters = [ [ [1.0, 1.0, 1.0], 5 ], [ [0.95, 1, 1], 4 ], [ [0.90, 1, 1], 3 ], [ [0.85, 1, 1], 2 ], [ [0.80, 1, 1], 1 ] ];
-			//var parameters = [ [ 0xff0000, 5 ], [ 0xff3300, 4 ], [ 0xff6600, 3 ], [ 0xff9900, 2 ], [ 0xffaa00, 1 ] ];
-			//parameters = [ [ 0xffffff, 5 ], [ 0xdddddd, 4 ], [ 0xaaaaaa, 3 ], [ 0x999999, 2 ], [ 0x777777, 1 ] ];
-			
-			var parameters = [ [ 0xff0000, 5 ], [ 0x00ff00, 4 ]];
 			var starSprite = THREE.ImageUtils.loadTexture("Resource/ball.png");
+			var partMaterial = new THREE.ParticleBasicMaterial( { size: 20, map: starSprite, vertexColors: true } );
 
-			var partMaterials = [];
-			var i = 0;
-			for ( i = 0; i < parameters.length; i ++ ) {
+			var particles = new THREE.ParticleSystem( starsGeometry, partMaterial );
+			starPs = particles;
 
-				var size  = parameters[i][1];
-				var color = parameters[i][0];
+			scene.add( particles );
 
-				partMaterials[i] = new THREE.ParticleBasicMaterial( { size: 20, map: starSprite, vertexColors: true } );
-
-				//partMaterials[i] = new THREE.ParticleBasicMaterial( { size: size } );
-				//partMaterials[i].color.setHSV( color[0], color[1], color[2] );
-
-				var particles = new THREE.ParticleSystem( starsGeometry, partMaterials[i] );
-				starPs = particles;
-
-				scene.add( particles );
-			}
 			// end PARTICLES
 		}
 
@@ -188,9 +166,11 @@ var Graphics = new function(){
 	var highlightedStar = null; // Currently highlighted star
 	var highlightedStarObj = null; // The 3d objecr representing the highlight
 	var starMaterials = [
-		new THREE.MeshBasicMaterial( { color: 0xff0000, wireframe: true } )
+		new THREE.MeshBasicMaterial( { color: 0x00ff00, wireframe: true } )
 	];
 
+	/** Highlights the passed in star with a sphere. Removes highlight from old star
+	 * if star parameter is null, all highlights removed **/
 	var highlightStar = function(star){
 		
 		if(star == highlightedStar) return;
@@ -201,7 +181,6 @@ var Graphics = new function(){
 		}
 		
 		if(star!=null){
-			// stars as spheres
 			// siz, latitudes, longitudes
 			var starObj = THREE.SceneUtils.createMultiMaterialObject( new THREE.SphereGeometry( 10, 10, 10 ), starMaterials );
 			starObj.position.set( star.x, star.y, star.z );
@@ -224,9 +203,6 @@ var Graphics = new function(){
 		stats.update();
     };
 
-	var radius = 600;
-	var theta = 180;
-
 	var animate = function() {
         var timeNow = new Date().getTime();
         if (lastTime != 0) {
@@ -246,11 +222,9 @@ var Graphics = new function(){
 		//var intersects = ray.intersectObjects( scene.children );
 		var intersects = ParticleIntesector.GetIntersection2(ray, [ starPs ] );
 		
-		if ( intersects.length > 0 ) {
-			
+		if ( intersects.length > 0 ) {	
 			// new intersection
-			INTERSECTED = intersects[ 0 ].object;
-			highlightStar(INTERSECTED.starPtr);
+			highlightStar(intersects[ 0 ].object);
 		} else {
 			// no new intersection
 			highlightStar(null);
