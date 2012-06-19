@@ -192,20 +192,26 @@ var Graphics = new function(){
 	];
 
 	var highlightStar = function(star){
+		
 		if(star == highlightedStar) return;
 		
 		if(highlightedStarObj != null){
 			scene.remove(highlightedStarObj);
+			highlightedStarObj = null;
 		}
 		
-		// stars as spheres
-		// siz, latitudes, longitudes
-		var starObj = THREE.SceneUtils.createMultiMaterialObject( new THREE.SphereGeometry( 10, 10, 10 ), starMaterials );
-		starObj.position.set( star.x, star.y, star.z );
-		scene.add( starObj );
-		
-		highlightedStar = star;
-		highlightedStarObj = starObj;
+		if(star!=null){
+			// stars as spheres
+			// siz, latitudes, longitudes
+			var starObj = THREE.SceneUtils.createMultiMaterialObject( new THREE.SphereGeometry( 10, 10, 10 ), starMaterials );
+			starObj.position.set( star.x, star.y, star.z );
+			scene.add( starObj );
+			
+			highlightedStar = star;
+			highlightedStarObj = starObj;
+		} else {
+			highlightedStar = null;
+		}
 	};
 
 	var lastTime = 0;
@@ -238,7 +244,6 @@ var Graphics = new function(){
 		var ray = new THREE.Ray( camera.position, vector.subSelf( camera.position ).normalize() );
 
 		//var intersects = ray.intersectObjects( scene.children );
-		//var intersects = ParticleIntesector.GetIntersection(ray, [ starPs ] );
 		var intersects = ParticleIntesector.GetIntersection2(ray, [ starPs ] );
 		
 		if ( intersects.length > 0 ) {
@@ -246,25 +251,9 @@ var Graphics = new function(){
 			// new intersection
 			INTERSECTED = intersects[ 0 ].object;
 			highlightStar(INTERSECTED.starPtr);
-			/*
-			
-			if ( INTERSECTED != intersects[ 0 ].object ) { 
-				// if not the same object
-				if ( INTERSECTED ) INTERSECTED.material.program = programFill; // clear old intersection
-
-				INTERSECTED = intersects[ 0 ].object;
-				INTERSECTED.material.program = programStroke;
-				
-				highlightedStar = INTERSECTED.starPtr;
-				alert(highlightedStar);
-			}*/
-
 		} else {
 			// no new intersection
-			highlightStar(INTERSECTED.starPtr);
-			/*if ( INTERSECTED ) INTERSECTED.material.program = programFill;
-
-			INTERSECTED = null;*/
+			highlightStar(null);
 		}
 		
 	};
